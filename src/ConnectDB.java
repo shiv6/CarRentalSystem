@@ -5,7 +5,7 @@ public class ConnectDB {
 	Statement st;
 	public ConnectDB() throws ClassNotFoundException, SQLException {
 		Class.forName("com.mysql.jdbc.Driver");
-		con = DriverManager.getConnection("jdbc:mysql://localhost:3306/car_rental_db?useSSL=false", "root", "TheGeniusM06");
+		con = DriverManager.getConnection("jdbc:mysql://localhost:3306/car_rental_db?useSSL=false", "root", "YourPassword");
 		st = con.createStatement();
 	}
 }

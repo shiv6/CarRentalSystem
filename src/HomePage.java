@@ -78,11 +78,12 @@ public class HomePage {
 		return null;
 	}
 	
-	public void register(User user, Car car, String from, String to) {
+	public void register(User user, Car car, LocalDate from, LocalDate to) {
 		try {
+			DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 			Statement st = con.con.createStatement();
-			st.executeUpdate("INSERT INTO history(uid, cid, issueDate, returnDate) VALUES (\'"+user.id+"\', \'"+car.id+"\', \'"+from+"\', \'"+to+"\')");
-			JOptionPane.showMessageDialog(frame, "Car Booked Successfully!\n Total rent : "+(car.rate * to.compareTo(from)+" /-"));
+			st.executeUpdate("INSERT INTO history(uid, cid, issueDate, returnDate) VALUES (\'"+user.id+"\', \'"+car.id+"\', \'"+from.format(format)+"\', \'"+to.format(format)+"\')");
+			JOptionPane.showMessageDialog(frame, "Car Booked Successfully!\n Total rent : "+(car.rate * (to.getDayOfYear() - from.getDayOfYear())+" /-"));
 			btnSearch.doClick();
 			frame.repaint();
 		} catch (SQLException e) {
@@ -190,7 +191,7 @@ public class HomePage {
 					if(car == null)
 						JOptionPane.showMessageDialog(frame, "Invalid ID", "Error", JOptionPane.ERROR_MESSAGE);
 					else
-						register(user, car, from.format(format), to.format(format));
+						register(user, car, from, to);
 				}catch(Exception x) {
 					JOptionPane.showMessageDialog(frame, "Invalid ID", "Error", JOptionPane.ERROR_MESSAGE);
 				}
@@ -218,7 +219,7 @@ public class HomePage {
 						textArea.setText("");
 						DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 						Statement st = con.con.createStatement();
-						String query = "SELECT * FROM cars WHERE id NOT IN (SELECT cid FROM history WHERE (issueDate < \'"+from.format(format)+"\' AND returnDate > \'"+from.format(format)+"\') OR (issueDate < \'"+to.format(format)+"\' AND returnDate > \'"+to.format(format)+"\') OR (issueDate <= \'"+from.format(format)+"\' AND returnDate >= \'"+to.format(format)+"\'))";
+						String query = "SELECT * FROM cars WHERE id NOT IN (SELECT cid FROM history WHERE (issueDate <= \'"+from.format(format)+"\' AND returnDate >= \'"+from.format(format)+"\') OR (issueDate <= \'"+to.format(format)+"\' AND returnDate >= \'"+to.format(format)+"\') OR (issueDate <= \'"+from.format(format)+"\' AND returnDate >= \'"+to.format(format)+"\'))";
 						ResultSet res = st.executeQuery(query);
 						while(res.next()) {
 							Car car = new Car(Integer.parseInt(res.getString("id")), res.getString("brand"), res.getString("model"), res.getString("color"), res.getString("number"), Integer.parseInt(res.getString("value")), Double.parseDouble(res.getString("rate")));
